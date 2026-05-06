@@ -172,7 +172,7 @@ async def callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = q.data
 
     # -------- GENERO --------
-    if data.startswith("gender_") and user["estado"] == "genero":
+    if data.startswith("gender_"):
         user["genero"] = data.split("_")[1]
         user["estado"] = "razas"
         return await menu_razas(update, context)
