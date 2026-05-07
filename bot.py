@@ -296,11 +296,17 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("raza_"):
         raza = data.replace("raza_", "")
         # =========================
-        # BLOQUEO DE RAZAS PREMIUM
+        # PREMIUM -> mostrar descripción pero NO confirmar
         # =========================
         if raza in razas_premium:
-           await query.answer("❌ Esta raza es premium y no puedes seleccionarla todavía.", show_alert=True)
-           return
+            await query.edit_message_text(
+                f"⚔️ {raza}\n\n{descripciones[raza]}",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔙 Volver", callback_data="volver_raza")]
+                ])
+            )
+            return
+            
         # =====================================
         # ÁNGELES Y DEMONIO
         # SOLO INFORMATIVOS
