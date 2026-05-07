@@ -273,6 +273,11 @@ Selecciona tu género:""",
         )
 
 # =========================
+# RAZAS QUE SON PREMIUM
+# =========================
+razas_premium = ["Draconiano", "Argoniano", "Necromano", "Skaldar"]
+
+# =========================
 # RAZAS
 # =========================
 async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -290,7 +295,12 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # =========================
     if data.startswith("raza_"):
         raza = data.replace("raza_", "")
-
+        # =========================
+        # BLOQUEO DE RAZAS PREMIUM
+        # =========================
+        if raza in razas_premium:
+           await query.answer("❌ Esta raza es premium y no puedes seleccionarla todavía.", show_alert=True)
+           return
         # =====================================
         # ÁNGELES Y DEMONIO
         # SOLO INFORMATIVOS
