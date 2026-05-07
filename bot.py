@@ -337,6 +337,41 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 # =========================
+# NOMBRE
+# =========================
+async def set_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    jugador = get_player(update.effective_user.id)
+
+    if not context.args:
+        await update.message.reply_text(
+            "❌ Debes escribir un nombre.\nEjemplo:\n/name Arthas"
+        )
+        return
+
+    nombre_temp = " ".join(context.args)
+    nombre_norm = normalizar_nombre(nombre_temp)
+
+    if not nombre_valido(nombre_norm):
+        await update.message.reply_text(
+            "❌ Nombre inválido.\nSolo letras y espacios.\nMáximo 20 caracteres."
+        )
+        return
+
+    for u in jugadores.values():
+        if u.get("nombre") == nombre_norm:
+            await update.message.reply_text(
+                "❌ Ese nombre ya está en uso."
+            )
+            return
+
+    jugador["nombre_temp"] = nombre_temp
+    jugador["nombre_temp_norm"] = nombre_norm
+
+    await update.message.reply_text(
+        f"Tu nombre será:\n\n⚔️ {nombre_norm}",
+        reply_markup=botones_confirmar_nombre()
+    )
+# =========================
 # CONFIRMAR NOMBRE
 # =========================
 async def confirmar_nombre_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
