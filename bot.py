@@ -285,8 +285,30 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     jugador = get_player(query.from_user.id)
     data = query.data
 
+    # =========================
+    # SELECCIÓN DE RAZA
+    # =========================
     if data.startswith("raza_"):
         raza = data.replace("raza_", "")
+
+        # =====================================
+        # ÁNGELES Y DEMONIO
+        # SOLO INFORMATIVOS
+        # =====================================
+        if raza in ["Ángeles", "Demonio"]:
+
+            await query.edit_message_text(
+                f"ℹ️ {raza}\n\n{descripciones[raza]}",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔙 Volver", callback_data="volver_raza")]
+                ])
+            )
+
+            return
+
+        # =====================================
+        # RAZAS JUGABLES
+        # =====================================
         jugador["raza"] = raza
 
         await query.edit_message_text(
@@ -294,6 +316,9 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=botones_confirmar_raza()
         )
 
+    # =========================
+    # VOLVER A RAZAS
+    # =========================
     elif data == "volver_raza":
         jugador["raza"] = None
 
@@ -302,45 +327,13 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=botones_razas(jugador["genero"])
         )
 
+    # =========================
+    # CONFIRMAR RAZA
+    # =========================
     elif data == "confirmar_raza":
+
         await query.edit_message_text(
             "✍️ Ahora escribe tu nombre usando:\n/name TuNombre"
-        )
-
-# =========================
-# NOMBRE
-# =========================
-async def set_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    jugador = get_player(update.effective_user.id)
-
-    if not context.args:
-        await update.message.reply_text(
-            "❌ Debes escribir un nombre.\nEjemplo:\n/name Arthas"
-        )
-        return
-
-    nombre_temp = " ".join(context.args)
-    nombre_norm = normalizar_nombre(nombre_temp)
-
-    if not nombre_valido(nombre_norm):
-        await update.message.reply_text(
-            "❌ Nombre inválido.\nSolo letras y espacios.\nMáximo 20 caracteres."
-        )
-        return
-
-    for u in jugadores.values():
-        if u.get("nombre") == nombre_norm:
-            await update.message.reply_text(
-                "❌ Ese nombre ya está en uso."
-            )
-            return
-
-    jugador["nombre_temp"] = nombre_temp
-    jugador["nombre_temp_norm"] = nombre_norm
-
-    await update.message.reply_text(
-        f"Tu nombre será:\n\n⚔️ {nombre_norm}",
-        reply_markup=botones_confirmar_nombre()
     )
 
 # =========================
