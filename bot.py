@@ -240,7 +240,8 @@ async def seleccionar_genero(update: Update, context: ContextTypes.DEFAULT_TYPE)
     jugador = get_player(update.effective_user.id)
     jugador["estado"] = "genero"
 
-    msg = await update.message.reply_text(
+    msg = await update.message.reply_photo(
+    photo=imagenes["bienvenida"],
         """🔥~Bienvenid@ a MissiaM~🔥
 
 Un mundo de fantasía, ficción y misterios que encenderán tus cinco sentidos hasta un límite que te hará desear la ayuda de los dioses... Lleno de secretos, guerras y conspiraciones, MissiaM se convertirá en el centro de toda la discordia que lo rodea, mientras un Rey busca la paz, muchos otros conspiran para desestabilizar la corona y el legado que una vez los unió.
@@ -269,13 +270,13 @@ async def genero_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("genero_"):
         jugador["genero"] = "Masculino" if data == "genero_M" else "Femenino"
 
-        await query.edit_message_text(
+        await query.edit_message_caption(
             f"Has seleccionado el género: {jugador['genero']}",
             reply_markup=botones_confirmar_genero()
         )
 
     elif data == "volver_genero":
-        await query.edit_message_text(
+        await query.edit_message_caption(
             """🔥~Bienvenid@ a MissiaM~🔥
 
 Un mundo de fantasía, ficción y misterios que encenderán tus cinco sentidos hasta un límite que te hará desear la ayuda de los dioses... Lleno de secretos, guerras y conspiraciones, MissiaM se convertirá en el centro de toda la discordia que lo rodea, mientras un Rey busca la paz, muchos otros conspiran para desestabilizar la corona y el legado que una vez los unió.
