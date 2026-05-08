@@ -291,13 +291,13 @@ Selecciona tu género:""",
         )
 
     elif data == "confirmar_genero":
-    await query.edit_message_media(
-        media=InputMediaPhoto(
-            media=imagenes["bienvenida"],
-            caption="Selecciona tu raza:"
-        ),
+        await query.edit_message_media(
+            media=InputMediaPhoto(
+                media=imagenes["bienvenida"],
+                caption="Selecciona tu raza:"
+            ),
         reply_markup=botones_razas(jugador["genero"])
-    )
+        )
 
 # =========================
 # RAZAS QUE SON PREMIUM
@@ -327,10 +327,14 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # =========================
         if raza in razas_premium:
             await query.edit_message_media(
-    media=InputMediaPhoto(
-        media=imagenes[raza],
-        caption=f"⚔️ {raza}\n\n{descripciones[raza]}"
-    )
+                media=InputMediaPhoto(
+                    media=imagenes[raza],
+                    caption=f"⚔️ {raza}\n\n{descripciones[raza]}"
+        ),
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔙 Volver", callback_data="volver_raza")]
+                ])
+            )
             return
             
         # =====================================
@@ -338,37 +342,43 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # SOLO INFORMATIVOS
         # =====================================
         if raza in ["Ángeles", "Demonio"]:
-
+            
             await query.edit_message_media(
-    media=InputMediaPhoto(
-        media=imagenes[raza],
-        caption=f"ℹ️ {raza}\n\n{descripciones[raza]}"
-    )
-
+                media=InputMediaPhoto(
+                    media=imagenes[raza],
+                    caption=f"ℹ️ {raza}\n\n{descripciones[raza]}"
+                ),
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔙 Volver", callback_data="volver_raza")]
+                ])
+            )
+            
             return
 
         # =====================================
         # RAZAS JUGABLES
         # =====================================
         jugador["raza"] = raza
-
+        
         await query.edit_message_media(
-    media=InputMediaPhoto(
-        media=imagenes[raza],
-        caption=f"⚔️ {raza}\n\n{descripciones[raza]}"
-    )
+            media=InputMediaPhoto(
+                media=imagenes[raza],
+                caption=f"⚔️ {raza}\n\n{descripciones[raza]}"
+                ),
+            reply_markup=botones_confirmar_raza()
+        )
 
     # =========================
     # VOLVER A RAZAS
     # =========================
     elif data == "volver_raza":
         jugador["raza"] = None
-
+        
         await query.edit_message_media(
-    media=InputMediaPhoto(
-        media=imagenes["bienvenida"],
-        caption="Selecciona tu raza:"
-    ),
+            media=InputMediaPhoto(
+                media=imagenes["bienvenida"],
+                caption="Selecciona tu raza:"
+            ),
 
     # =========================
     # CONFIRMAR RAZA
