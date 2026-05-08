@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InputMediaPhoto
+)
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
