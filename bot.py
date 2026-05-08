@@ -11,6 +11,29 @@ from telegram.ext import (
 TOKEN = os.getenv("BOT_TOKEN")
 
 # =========================
+# IMÁGENES
+# =========================
+imagenes = {
+
+    "bienvenida": "https://ibb.co/1fXtCj7b",
+
+    "Humano": "https://ibb.co/Kj9207N4",
+    "Elfo": "https://ibb.co/4Z2SCf9n",
+    "Enano": "https://ibb.co/Z6GBytsx",
+    "SemiBestia": "https://ibb.co/tpLSZkPx",
+    "Gigante": "https://ibb.co/XkyC6fN8",
+    "Sirena": "https://ibb.co/9kcjRkv3",
+
+    "Draconiano": "https://ibb.co/Y4m6NH1z",
+    "Argoniano": "https://ibb.co/pvFtsMC0",
+    "Necromano": "https://ibb.co/m55MvvBK",
+    "Skaldar": "https://ibb.co/fdh30kCn",
+
+    "Ángeles": "https://ibb.co/45wx6D9",
+    "Demonio": "https://ibb.co/20dr1Ryr"
+}
+
+# =========================
 # JUGADORES
 # =========================
 jugadores = {}
