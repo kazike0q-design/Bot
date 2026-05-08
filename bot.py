@@ -392,8 +392,8 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # =========================
     elif data == "confirmar_raza":
 
-        await query.edit_message_text(
-            "✍️ Ahora escribe tu nombre usando:\n/name TuNombre"
+        await query.edit_message_caption(
+            caption="✍️ Ahora escribe tu nombre usando:\n/name TuNombre"
     )
 
 # =========================
