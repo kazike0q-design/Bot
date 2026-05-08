@@ -15,7 +15,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 # =========================
 imagenes = {
 
-    "bienvenida": "https://ibb.co/1fXtCj7b",
+    "bienvenida": "https://ibb.co/zWZfptcG",
 
     "Humano": "https://ibb.co/Kj9207N4",
     "Elfo": "https://ibb.co/4Z2SCf9n",
