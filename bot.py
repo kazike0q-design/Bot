@@ -379,6 +379,8 @@ async def raza_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 media=imagenes["bienvenida"],
                 caption="Selecciona tu raza:"
             ),
+            reply_markup=botones_razas(jugador["genero"])
+        )
 
     # =========================
     # CONFIRMAR RAZA
