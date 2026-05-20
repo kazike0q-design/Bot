@@ -23,6 +23,7 @@ from mapas.ciudades.valenia import valenia_submapas, valenia_data
 from mapas.spawn import spawn_player_by_race
 from mapas.bfs import bfs
 from mapas.movimiento import calculartiempomovimiento, mover_jugador
+from ficha import botones_ficha, ficha_handler
 
 # =========================
 # TEXTO DE BIENVENIDA (centralizado para fácil edición)
@@ -461,6 +462,8 @@ async def confirmar_nombre_handler(update: Update, context: ContextTypes.DEFAULT
 # MAIN
 # =========================
 app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(CallbackQueryHandler(ficha_handler, pattern="^ficha$"))
 
 app.add_handler(CommandHandler("start", seleccionar_genero))
 app.add_handler(
