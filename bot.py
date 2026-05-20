@@ -59,19 +59,44 @@ imagenes = {
 }
 
 # =========================
-# JUGADORES
+# JUGADORES - get_player rectificado
 # =========================
-jugadores = {}
+import asyncio as _asyncio
 
 def get_player(user_id):
+    """
+    Crea o devuelve la ficha del jugador. Asegura que exista un asyncio.Lock por jugador
+    y que la ficha contenga los campos necesarios para movimiento (BFS/handlers).
+    """
     if user_id not in jugadores:
         jugadores[user_id] = {
+            # --- creación / identidad ---
             "genero": None,
             "raza": None,
             "nombre": None,
             "nombre_temp": None,
             "nombre_temp_norm": None,
-            "estado": "genero"
+            "estado": "genero",
+
+            # --- ubicación y navegación ---
+            "ubicacion": "bosque",     # nodo global actual (id)
+            "en_ciudad": False,        # si está dentro de una ciudad
+            "ciudad": None,            # id de la ciudad si en_ciudad == True
+            "sububicacion": None,      # nodo dentro de la ciudad
+
+            # --- control de movimiento / concurrencia ---
+            "moviendo": False,         # flag para evitar movimientos concurrentes
+            "lock": _asyncio.Lock(),   # lock por jugador para operaciones críticas
+
+            # --- atributos de juego (ejemplos usados por movimiento) ---
+            "montura_equipada": False,
+            "tipo_montura": None,
+            "pocion_velocidad": None,
+            "peso_inventario": 0,
+            "energia": 100,
+            "oro": 0,
+            "nivel": 1,
+            "monturaguardadaen": None
         }
     return jugadores[user_id]
 
