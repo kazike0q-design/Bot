@@ -17,6 +17,14 @@ from telegram.ext import (
 TOKEN = os.getenv("BOT_TOKEN")
 
 # =========================
+# imports de mapas específicos para Valenia y movimiento
+# =========================
+from mapas.ciudades.valenia import valenia_submapas, valenia_data
+from mapas.spawn import spawn_player_by_race
+from mapas.bfs import bfs
+from mapas.movimiento import calculartiempomovimiento, mover_jugador
+
+# =========================
 # TEXTO DE BIENVENIDA (centralizado para fácil edición)
 # =========================
 BIENVENIDA_TEXTO = """🔥~Bienvenid@ a MissiaM~🔥
