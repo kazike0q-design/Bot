@@ -1,4 +1,4 @@
-# bot_handlers.py  (fragmento para pegar en bot.py)
+# bot_handlers.py  (fragmento integrado listo para pegar/reemplazar)
 import asyncio
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
@@ -25,12 +25,15 @@ def get_player(user_id: int):
     import asyncio as _asyncio
     if user_id not in jugadores:
         jugadores[user_id] = {
-            "ubicacion": "bosque",
+            # ubicación y estado
+            "ubicacion": "bosque",   # nodo global por defecto
             "en_ciudad": False,
             "sububicacion": None,
             "ciudad": None,
+            # control de movimiento / concurrencia
             "moviendo": False,
             "lock": _asyncio.Lock(),
+            # atributos básicos
             "montura_equipada": False,
             "tipo_montura": None,
             "pocion_velocidad": None,
@@ -38,36 +41,53 @@ def get_player(user_id: int):
             "energia": 100,
             "oro": 0,
             "nivel": 1,
-            "monturaguardadaen": None
+            "monturaguardadaen": None,
+            # campos de creación (si tu bot los usa)
+            "genero": None,
+            "raza": None,
+            "nombre": None,
+            "nombre_temp": None,
+            "nombre_temp_norm": None,
+            "estado": "genero"
         }
     return jugadores[user_id]
 
 def botones_global(jugador):
     """
     Construye InlineKeyboardMarkup con destinos conectados al nodo global actual.
-    callback_data: move_<destino>
+    Añade siempre el botón '🗺️ Ubicación' al final.
     """
     botones = []
     origen = jugador["ubicacion"]
     for destino in mapa_global.get(origen, {}).get("conexiones", []):
         nombre = mapa_global.get(destino, {}).get("nombre", destino)
         botones.append([InlineKeyboardButton(nombre, callback_data=f"move_{destino}")])
-    return InlineKeyboardMarkup(botones) if botones else None
+
+    # Botón permanente para ver la ubicación actual
+    botones.append([InlineKeyboardButton("🗺️ Ubicación", callback_data="ubicacion")])
+
+    return InlineKeyboardMarkup(botones) if botones else InlineKeyboardMarkup([[InlineKeyboardButton("🗺️ Ubicación", callback_data="ubicacion")]])
 
 def botones_ciudad(jugador, submapas):
     """
     Construye InlineKeyboardMarkup para movimientos dentro de la ciudad.
-    callback_data: city_<destino>
+    Añade siempre el botón '🗺️ Ubicación' al final.
     """
     botones = []
     ciudad = jugador["ciudad"]
     if not ciudad or ciudad not in submapas:
-        return None
+        # aun así devolvemos el botón de ubicación para poder consultarla
+        return InlineKeyboardMarkup([[InlineKeyboardButton("🗺️ Ubicación", callback_data="ubicacion")]])
+
     actual = jugador["sububicacion"]
     for destino in submapas[ciudad][actual]["conexiones"]:
         nombre = submapas[ciudad].get(destino, {}).get("nombre", destino)
         botones.append([InlineKeyboardButton(nombre, callback_data=f"city_{destino}")])
-    return InlineKeyboardMarkup(botones) if botones else None
+
+    # Botón permanente para ver la ubicación actual dentro de la ciudad
+    botones.append([InlineKeyboardButton("🗺️ Ubicación", callback_data="ubicacion")])
+
+    return InlineKeyboardMarkup(botones) if botones else InlineKeyboardMarkup([[InlineKeyboardButton("🗺️ Ubicación", callback_data="ubicacion")]])
 
 # Movimiento global por botón (30s base)
 async def mover_global(update: Update, context: ContextTypes.DEFAULT_TYPE, destino: str):
@@ -101,8 +121,15 @@ async def mover_global(update: Update, context: ContextTypes.DEFAULT_TYPE, desti
         jugador["ubicacion"] = destino
         jugador["moviendo"] = False
 
+        # Mensaje al llegar: nombre + descripción si existe
+        nombre = mapa_global.get(destino, {}).get("nombre", destino)
+        descripcion = mapa_global.get(destino, {}).get("descripcion") or mapa_global.get(destino, {}).get("texto") or ""
+        texto = f"📍 {nombre}"
+        if descripcion:
+            texto += f"\n\n{descripcion}"
+
         await query.edit_message_text(
-            f"📍 {mapa_global.get(destino, {}).get('nombre', destino)}",
+            texto,
             reply_markup=botones_global(jugador)
         )
 
@@ -132,8 +159,16 @@ async def entrar_ciudad(update: Update, context: ContextTypes.DEFAULT_TYPE, puer
         jugador["ciudad"], jugador["sububicacion"] = entrada
         jugador["moviendo"] = False
 
+        # Mensaje al entrar: nombre + descripción si existe
+        nodo = submapas[jugador['ciudad']][jugador['sububicacion']]
+        nombre = nodo.get("nombre", jugador['sububicacion'])
+        descripcion = nodo.get("descripcion") or nodo.get("texto") or ""
+        texto = f"🏙️ {nombre}"
+        if descripcion:
+            texto += f"\n\n{descripcion}"
+
         await query.edit_message_text(
-            f"🏙️ {submapas[jugador['ciudad']][jugador['sububicacion']]['nombre']}",
+            texto,
             reply_markup=botones_ciudad(jugador, submapas)
         )
 
@@ -160,8 +195,16 @@ async def mover_ciudad(update: Update, context: ContextTypes.DEFAULT_TYPE, desti
         return
 
     jugador["sububicacion"] = destino
+
+    # Mensaje al moverse dentro de la ciudad
+    nombre = submapas[ciudad][destino].get("nombre", destino)
+    descripcion = submapas[ciudad][destino].get("descripcion") or submapas[ciudad][destino].get("texto") or ""
+    texto = f"📍 {nombre}"
+    if descripcion:
+        texto += f"\n\n{descripcion}"
+
     await query.edit_message_text(
-        f"📍 {submapas[ciudad][destino]['nombre']}",
+        texto,
         reply_markup=botones_ciudad(jugador, submapas)
     )
 
@@ -201,9 +244,48 @@ async def godirect(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await asyncio.sleep(tiempo_final)
 
     jugador["ubicacion"] = destino
-    await update.message.reply_text(f"📍 Has llegado a {mapa_global[destino]['nombre']}", reply_markup=botones_global(jugador))
+    nombre = mapa_global[destino].get("nombre", destino)
+    await update.message.reply_text(f"📍 Has llegado a {nombre}", reply_markup=botones_global(jugador))
 
-# Callback handler para botones
+# Mostrar la ubicación actual (reenvía el mensaje con nombre + descripción)
+async def mostrar_ubicacion(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    jugador = get_player(query.from_user.id)
+
+    # Si está dentro de una ciudad, mostrar submapa
+    if jugador.get("en_ciudad"):
+        ciudad = jugador.get("ciudad")
+        sub = jugador.get("sububicacion")
+        if ciudad and sub and ciudad in SUBMAPAS and sub in SUBMAPAS[ciudad]:
+            nodo = SUBMAPAS[ciudad][sub]
+            nombre = nodo.get("nombre", sub)
+            descripcion = nodo.get("descripcion") or nodo.get("texto") or ""
+            texto = f"📍 {nombre}"
+            if descripcion:
+                texto += f"\n\n{descripcion}"
+            reply_markup = botones_ciudad(jugador, SUBMAPAS)
+        else:
+            texto = "❌ No se encontró la ubicación dentro de la ciudad."
+            reply_markup = None
+    else:
+        # Ubicación global
+        ubic = jugador.get("ubicacion")
+        nodo = mapa_global.get(ubic, {}) if ubic else {}
+        nombre = nodo.get("nombre", ubic or "No asignada")
+        descripcion = nodo.get("descripcion") or nodo.get("texto") or ""
+        texto = f"📍 {nombre}"
+        if descripcion:
+            texto += f"\n\n{descripcion}"
+        reply_markup = botones_global(jugador)
+
+    # Intentar editar el mensaje original; si falla, enviar un nuevo mensaje
+    try:
+        await query.edit_message_text(texto, reply_markup=reply_markup)
+    except Exception:
+        await query.message.reply_text(texto, reply_markup=reply_markup)
+
+# Callback handler para botones (actualizado para 'ubicacion')
 async def botones_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -220,6 +302,8 @@ async def botones_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("city_"):
         destino = data.split("_", 1)[1]
         await mover_ciudad(update, context, destino, SUBMAPAS)
+    elif data == "ubicacion":
+        await mostrar_ubicacion(update, context)
 
 # /start handler
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
