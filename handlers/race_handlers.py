@@ -143,25 +143,19 @@ async def back_to_race_selection(
     )
 
 
-async def confirm_race(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE
-):
+async def confirm_race(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
-    race_key = query.data.replace(
-        "confirm_race_",
-        ""
-    )
+    race_key = query.data.replace("confirm_race_", "")
 
     if race_key not in RACES:
         return
 
     context.user_data["race"] = RACES[race_key]["name"]
 
-await race_intro_after_confirm(update, context)
-
+    await race_intro_after_confirm(update, context)
+    return
 
 def register_race_handlers(app):
 
@@ -185,9 +179,10 @@ def register_race_handlers(app):
             pattern="^back_race_selection$"
         )
     )
-  app.add_handler(
+    
+    app.add_handler(
     CallbackQueryHandler(
         enter_portal,
         pattern="^enter_portal$"
     )
-  )
+    )
