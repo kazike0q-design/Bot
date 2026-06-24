@@ -181,8 +181,8 @@ def register_race_handlers(app):
     )
     
     app.add_handler(
-    CallbackQueryHandler(
-        enter_portal,
-        pattern="^enter_portal$"
-    )
+        CallbackQueryHandler(
+            enter_portal,
+            pattern="^enter_portal$"
+        )
     )
