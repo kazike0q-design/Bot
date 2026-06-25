@@ -1,4 +1,5 @@
 from telegram.ext import Application
+import os
 
 from handlers.race_handlers import register_race_handlers
 from handlers.start import register_start_handlers
