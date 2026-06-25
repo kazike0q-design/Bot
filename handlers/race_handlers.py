@@ -48,12 +48,12 @@ Progreso : ██████▒▒▒▒ 60%
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
   
-    async def enter_portal(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        query = update.callback_query
-        await query.answer()
+async def enter_portal(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
 
-        await query.edit_message_caption(
-            caption="🌀 El portal se abre... comienzas tu aventura en MissiaM..."
+    await query.edit_message_caption(
+        caption="🌀 El portal se abre... comienzas tu aventura en MissiaM..."
     )
 
 RACE_SELECTION_TEXT = """
