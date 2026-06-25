@@ -12,7 +12,7 @@ def main():
 
     # Registrar handlers
     register_start_handlers(app)
-    register_start_handlers(app)
+    register_race_handlers(app)
 
     print("MissiaM iniciado correctamente.")
 
